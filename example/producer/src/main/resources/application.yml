@@ -1,0 +1,11 @@
+server:
+  port: 8801
+spring:
+  application:
+    name: producer
+  cloud:
+    nacos:
+      discovery:
+        server-addr: ${NACOS_SERVER_ADDR:127.0.0.1:8848}
+      password: nacos
+      username: nacos

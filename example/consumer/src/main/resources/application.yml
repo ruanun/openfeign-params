@@ -1,0 +1,54 @@
+server:
+  port: 8802
+spring:
+  application:
+    name: consumer
+  cloud:
+    loadbalancer:
+      nacos:
+        enabled: true
+    nacos:
+      discovery:
+        server-addr: ${NACOS_SERVER_ADDR:127.0.0.1:8848}
+      password: nacos
+      username: nacos
+feign:
+  params:
+    #拦截路径，默认值：/** ；所有
+    intercept-paths:
+      - /**
+    param-configs:
+      userinfo:
+        - source-name: uname
+          source-type: QUERY
+          target-name: username
+          target-type: QUERY
+        - source-name: uname
+          source-type: QUERY
+          target-name: name
+          target-type: QUERY
+        - source-name: uid
+          source-type: HEADER
+          target-name: userId
+          target-type: QUERY
+        - source-name: uid
+          source-type: HEADER
+          target-name: userId
+          target-type: HEADER
+        - source-name: uid
+          source-type: QUERY
+          target-name: user-id
+          target-type: HEADER
+      tenantInfo:
+        - source-name: tenantId
+          source-type: HEADER
+          target-name: tenant-id
+          target-type: HEADER
+    param-method-mapping:
+      get:
+        - userinfo
+        - tenantInfo
+      post:
+        - userinfo
+        - tenantInfo
+
