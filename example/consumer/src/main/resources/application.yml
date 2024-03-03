@@ -44,6 +44,12 @@ feign:
           source-type: HEADER
           target-name: tenant-id
           target-type: HEADER
+          include-paths:
+            - /**
+          exclude-paths:
+            - /user/login
+            - /user/register
+
     param-method-mapping:
       get:
         - userinfo

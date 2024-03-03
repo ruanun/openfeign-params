@@ -1,6 +1,6 @@
 package com.ruanun.openfeign.params;
 
-import com.ruanun.openfeign.params.hadlers.*;
+import com.ruanun.openfeign.params.strategys.*;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -30,25 +30,25 @@ public class AuoConfiguration {
     }
 
     @Bean
-    @ConditionalOnMissingBean(HeaderParamHandler.class)
-    public HeaderParamHandler headerParamHandler() {
-        return new HeaderParamHandler();
+    @ConditionalOnMissingBean(HeaderParamStrategy.class)
+    public HeaderParamStrategy headerParamStrategy() {
+        return new HeaderParamStrategy();
     }
 
     @Bean
-    @ConditionalOnMissingBean(QueryParamHandler.class)
-    public QueryParamHandler queryParamHandler() {
-        return new QueryParamHandler();
+    @ConditionalOnMissingBean(QueryParamStrategy.class)
+    public QueryParamStrategy queryParamStrategy() {
+        return new QueryParamStrategy();
     }
 
     @Bean
-    @ConditionalOnMissingBean(HandlerContainer.class)
-    public HandlerContainer paramGettingHandlers(List<IParamGettingHandler> paramGettingHandlers, List<IParamSettingHandler> paramSettingHandlers) {
-        return new HandlerContainer(paramGettingHandlers, paramSettingHandlers);
+    @ConditionalOnMissingBean(StrategyContainer.class)
+    public StrategyContainer paramGettingContainer(List<IParamGettingStrategy> paramGettingStrategies, List<IParamSettingStrategy> paramSettingStrategies) {
+        return new StrategyContainer(paramGettingStrategies, paramSettingStrategies);
     }
 
     @Bean
-    public ParamProcessRequestInterceptor paramProcessRequestInterceptor(OpenFeignParamsConfig openFeignParamsConfig, HandlerContainer handlerContainer) {
-        return new ParamProcessRequestInterceptor(openFeignParamsConfig, handlerContainer);
+    public ParamProcessRequestInterceptor paramProcessRequestInterceptor(OpenFeignParamsConfig openFeignParamsConfig, StrategyContainer strategyContainer) {
+        return new ParamProcessRequestInterceptor(openFeignParamsConfig, strategyContainer);
     }
 }

@@ -1,8 +1,8 @@
 package com.ruanun.openfeign.params;
 
-import com.ruanun.openfeign.params.hadlers.HandlerContainer;
-import com.ruanun.openfeign.params.hadlers.IParamGettingHandler;
-import com.ruanun.openfeign.params.hadlers.IParamSettingHandler;
+import com.ruanun.openfeign.params.strategys.IParamGettingStrategy;
+import com.ruanun.openfeign.params.strategys.IParamSettingStrategy;
+import com.ruanun.openfeign.params.strategys.StrategyContainer;
 import feign.RequestInterceptor;
 import feign.RequestTemplate;
 import lombok.extern.slf4j.Slf4j;
@@ -22,13 +22,13 @@ import java.util.stream.Collectors;
 public class ParamProcessRequestInterceptor implements RequestInterceptor, Ordered {
 
     private final Map<HttpMethod, List<ParamConfig>> paramMethodMapping;
-    private final HandlerContainer handlerContainer;
+    private final StrategyContainer strategyContainer;
 
     private final OpenFeignParamsConfig openFeignParamsConfig;
     private final PathPatternParser pathPatternParser = new PathPatternParser();
 
-    public ParamProcessRequestInterceptor(OpenFeignParamsConfig openFeignParamsConfig, HandlerContainer handlerContainer) {
-        this.handlerContainer = handlerContainer;
+    public ParamProcessRequestInterceptor(OpenFeignParamsConfig openFeignParamsConfig, StrategyContainer strategyContainer) {
+        this.strategyContainer = strategyContainer;
         this.paramMethodMapping = new HashMap<>();
         this.openFeignParamsConfig = openFeignParamsConfig;
         initParamMethodMapping(openFeignParamsConfig);
@@ -60,23 +60,23 @@ public class ParamProcessRequestInterceptor implements RequestInterceptor, Order
             if (!isMatchParamPath(feignUrl, paramConfig)) {
                 continue;
             }
-            IParamGettingHandler paramGettingHandler = handlerContainer.getParamGettingHandler(paramConfig.getSourceType());
-            if (Objects.isNull(paramGettingHandler)) {
-                log.warn("can not find handler for source type: {}", paramConfig.getSourceType());
+            IParamGettingStrategy paramGetting = strategyContainer.getParamGetting(paramConfig.getSourceType());
+            if (Objects.isNull(paramGetting)) {
+                log.warn("can not find Strategy for source type: {}", paramConfig.getSourceType());
                 continue;
             }
-            Object paramValue = paramGettingHandler.handle(paramConfig, requestTemplate);
+            Object paramValue = paramGetting.handle(paramConfig, requestTemplate);
             log.debug("paramValue: {} for paramConfig: {}", paramValue, paramConfig);
             if (Objects.isNull(paramValue)) {
                 log.debug("paramValue is null: {}", paramConfig);
                 continue;
             }
-            IParamSettingHandler paramSettingHandler = handlerContainer.getParamSettingHandler(paramConfig.getTargetType());
-            if (Objects.isNull(paramSettingHandler)) {
-                log.warn("can not find handler for target type: {}", paramConfig.getTargetType());
+            IParamSettingStrategy paramSetting = strategyContainer.getParamSetting(paramConfig.getTargetType());
+            if (Objects.isNull(paramSetting)) {
+                log.warn("can not find Strategy for target type: {}", paramConfig.getTargetType());
                 continue;
             }
-            paramSettingHandler.handle(paramConfig, requestTemplate, paramValue);
+            paramSetting.handle(paramConfig, requestTemplate, paramValue);
         }
     }
 

@@ -1,4 +1,4 @@
-package com.ruanun.openfeign.params.hadlers;
+package com.ruanun.openfeign.params.strategys;
 
 import com.ruanun.openfeign.params.ParamConfig;
 import feign.RequestTemplate;
@@ -6,7 +6,7 @@ import feign.RequestTemplate;
 /**
  * @author ruan
  */
-public interface IParamSettingHandler {
+public interface IParamSettingStrategy {
 
     String type();
 
